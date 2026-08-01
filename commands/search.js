@@ -5,7 +5,7 @@ module.exports = (bot) => {
     const chatId = msg.chat.id;
     const query = match[1];
 
-    // Mensaje de carga
+    // Mensaje de referencia de búsqueda
     const loadingMsg = await bot.sendMessage(chatId, `🔎 Buscando "${query}"...`);
 
     const results = await searchMusic(query);
@@ -48,7 +48,13 @@ module.exports = (bot) => {
 
     try {
       const audio = await downloadAudioHybrid(data);
-      await bot.sendAudio(chatId, audio, { title: "Tu canción" });
+
+      // Validar si es Buffer o ruta de archivo
+      if (Buffer.isBuffer(audio)) {
+        await bot.sendAudio(chatId, audio, { title: "Tu canción" });
+      } else {
+        await bot.sendAudio(chatId, audio, { title: "Tu canción" });
+      }
     } catch (err) {
       await bot.sendMessage(chatId, "❌ Error al enviar el audio.");
     }
