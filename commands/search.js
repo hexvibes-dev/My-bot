@@ -1,4 +1,4 @@
-const { searchMusic, downloadAudio } = require('../utils/music');
+const { searchMusic, downloadAudioHybrid } = require('../utils/music');
 
 module.exports = (bot) => {
   bot.onText(/\/search (.+)/, async (msg, match) => {
@@ -47,7 +47,8 @@ module.exports = (bot) => {
     await bot.sendMessage(chatId, "🎶 Descargando audio...");
 
     try {
-      await bot.sendAudio(chatId, downloadAudio(data));
+      const audio = await downloadAudioHybrid(data);
+      await bot.sendAudio(chatId, audio, { title: "Tu canción" });
     } catch (err) {
       await bot.sendMessage(chatId, "❌ Error al enviar el audio.");
     }
