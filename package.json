@@ -6,6 +6,8 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "node-telegram-bot-api": "^0.61.0"
+    "node-telegram-bot-api": "^0.61.0",
+    "yt-search": "^2.13.1",
+    "ytdl-core": "^4.11.5"
   }
 }
