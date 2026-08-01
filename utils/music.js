@@ -3,20 +3,26 @@ const fs = require('fs');
 
 async function searchMusic(query, offset = 0, limit = 7) {
   console.log(`[UTILS] Buscando en play-dl: ${query}`);
-  const results = await play.search(query, { limit: limit + offset });
-  console.log(`[UTILS] play-dl devolvió ${results.length} resultados`);
-  return results.slice(offset, offset + limit).map(v => ({
-    title: v.title,
-    url: v.url
-  }));
+  try {
+    const results = await play.search(query, { limit: limit + offset });
+    console.log(`[UTILS] play-dl devolvió ${results.length} resultados`);
+    return results.slice(offset, offset + limit).map(v => ({
+      title: v.title,
+      url: v.url
+    }));
+  } catch (err) {
+    console.error("[UTILS] Error en searchMusic:", err);
+    return [];
+  }
 }
 
 async function downloadAudioFile(url) {
   console.log(`[UTILS] Descargando audio de: ${url}`);
   try {
     const info = await play.video_info(url);
-    console.log(`[UTILS] Video info: ${info.video_details.title} (${info.video_details.durationInSec}s)`);
+    console.log(`[UTILS] Video info OK: ${info.video_details.title}`);
     const stream = await play.stream(info.url);
+    console.log("[UTILS] Stream abierto correctamente");
     const filePath = '/tmp/audio.mp3';
     return new Promise((resolve, reject) => {
       const writeStream = fs.createWriteStream(filePath);

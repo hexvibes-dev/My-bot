@@ -4,7 +4,6 @@ module.exports = (bot) => {
   bot.onText(/\/search (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const query = match[1];
-
     console.log(`[SEARCH] Query: ${query} from chat ${chatId}`);
 
     await bot.sendMessage(chatId, `🔎 Buscando "${query}"...`);
@@ -31,7 +30,6 @@ module.exports = (bot) => {
   bot.on('callback_query', async (query) => {
     const chatId = query.message.chat.id;
     const data = query.data;
-
     console.log(`[CALLBACK] Data: ${data} from chat ${chatId}`);
 
     if (data.startsWith("more:")) {
@@ -63,10 +61,6 @@ module.exports = (bot) => {
     } catch (err) {
       console.error("[CALLBACK] Error al enviar audio:", err);
       await bot.sendMessage(chatId, "❌ Error al enviar el audio.");
-    }
-
-    if (["group", "supergroup"].includes(query.message.chat.type)) {
-      bot.deleteMessage(chatId, query.message.message_id);
     }
   });
 };
