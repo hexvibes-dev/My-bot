@@ -10,8 +10,9 @@ async function searchMusic(query, offset = 0, limit = 7) {
 }
 
 async function downloadAudioFile(url) {
-  const stream = await play.stream(url);
-  const filePath = `/tmp/audio.mp3`;
+  const info = await play.video_info(url);
+  const stream = await play.stream(info.url);
+  const filePath = '/tmp/audio.mp3';
   return new Promise((resolve, reject) => {
     const writeStream = fs.createWriteStream(filePath);
     stream.stream.pipe(writeStream);
