@@ -1,27 +1,21 @@
-const { searchMusic, downloadAudioHybrid } = require('../utils/music');
+const { searchMusic, downloadAudioFile } = require('../utils/music');
 
 module.exports = (bot) => {
   bot.onText(/\/search (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     const query = match[1];
 
-    // Mensaje de referencia de búsqueda
-    const loadingMsg = await bot.sendMessage(chatId, `🔎 Buscando "${query}"...`);
+    await bot.sendMessage(chatId, `🔎 Buscando "${query}"...`);
 
     const results = await searchMusic(query);
     if (!results.length) {
-      return bot.editMessageText(`❌ No encontré nada para "${query}"`, {
-        chat_id: chatId,
-        message_id: loadingMsg.message_id
-      });
+      return bot.sendMessage(chatId, `❌ No encontré nada para "${query}"`);
     }
 
     const buttons = results.map(v => [{ text: v.title, callback_data: v.url }]);
     buttons.push([{ text: "➡️ Más resultados", callback_data: `more:${query}:7` }]);
 
-    bot.editMessageText(`🎵 Resultados para "${query}":`, {
-      chat_id: chatId,
-      message_id: loadingMsg.message_id,
+    bot.sendMessage(chatId, `🎵 Resultados para "${query}":`, {
       reply_markup: { inline_keyboard: buttons }
     });
   });
@@ -43,23 +37,15 @@ module.exports = (bot) => {
       });
     }
 
-    // Indicador de descarga
     await bot.sendMessage(chatId, "🎶 Descargando audio...");
 
     try {
-      const audio = await downloadAudioHybrid(data);
-
-      // Validar si es Buffer o ruta de archivo
-      if (Buffer.isBuffer(audio)) {
-        await bot.sendAudio(chatId, audio, { title: "Tu canción" });
-      } else {
-        await bot.sendAudio(chatId, audio, { title: "Tu canción" });
-      }
+      const filePath = await downloadAudioFile(data);
+      await bot.sendAudio(chatId, filePath, { title: "Tu canción" });
     } catch (err) {
       await bot.sendMessage(chatId, "❌ Error al enviar el audio.");
     }
 
-    // Borrar solo en grupos
     if (["group", "supergroup"].includes(query.message.chat.type)) {
       bot.deleteMessage(chatId, query.message.message_id);
     }
